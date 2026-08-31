@@ -74,3 +74,14 @@ Model performance can be evaluated using metrics such as:
 **Gayathri Galli**
 
 Data Engineer | AI/ML | Generative AI | Python | SQL | Cloud Data Engineering
+## 📚 Dataset
+
+Sample plant leaf images used in this project are from the PlantVillage Dataset, an open-access dataset containing images of healthy and diseased plant leaves.
+
+Dataset: https://github.com/spMohanty/PlantVillage-Dataset
+
+### Citation
+
+Mohanty, S. P., Hughes, D. P., & Salathé, M. (2016).  
+*Using Deep Learning for Image-Based Plant Disease Detection.*  
+Frontiers in Plant Science, 7, 1419.
