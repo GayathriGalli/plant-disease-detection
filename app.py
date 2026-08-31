@@ -17,6 +17,7 @@ st.write(
 )
 
 MODEL_PATH = Path("model/plant_disease_model.keras")
+CLASS_NAMES_PATH = Path("model/class_names.txt")
 
 
 @st.cache_resource
@@ -24,6 +25,14 @@ def load_model():
     if not MODEL_PATH.exists():
         return None
     return tf.keras.models.load_model(MODEL_PATH)
+
+
+def load_class_names():
+    if not CLASS_NAMES_PATH.exists():
+        return []
+
+    with open(CLASS_NAMES_PATH, "r", encoding="utf-8") as file:
+        return [line.strip() for line in file if line.strip()]
 
 
 def preprocess_image(image):
@@ -38,6 +47,7 @@ def preprocess_image(image):
 
 
 model = load_model()
+class_names = load_class_names()
 
 uploaded_file = st.file_uploader(
     "Upload a plant leaf image",
@@ -55,22 +65,40 @@ if uploaded_file is not None:
 
     if model is None:
         st.warning(
-            "The trained model is not included in this repository yet. "
-            "Add the trained model to model/plant_disease_model.keras "
-            "to enable predictions."
+            "The trained model is not available yet. "
+            "Run train_model.py to generate the model."
         )
 
-    elif st.button("Predict Disease"):
+    elif not class_names:
+        st.warning(
+            "Disease class labels are not available. "
+            "Run train_model.py to generate class_names.txt."
+        )
+
+    elif st.button("🔍 Predict Disease"):
         processed_image = preprocess_image(image)
 
-        predictions = model.predict(processed_image)
-        predicted_index = int(np.argmax(predictions[0]))
-        confidence = float(np.max(predictions[0])) * 100
+        with st.spinner("Analyzing leaf image..."):
+            predictions = model.predict(
+                processed_image,
+                verbose=0
+            )[0]
 
-        st.success(f"Predicted class index: {predicted_index}")
-        st.info(f"Confidence: {confidence:.2f}%")
+        predicted_index = int(np.argmax(predictions))
+        confidence = float(predictions[predicted_index]) * 100
+
+        if predicted_index < len(class_names):
+            disease_name = class_names[predicted_index]
+        else:
+            disease_name = f"Class {predicted_index}"
+
+        disease_name = disease_name.replace("___", " - ")
+        disease_name = disease_name.replace("_", " ")
+
+        st.success(f"🌱 Prediction: {disease_name}")
+        st.info(f"🎯 Confidence: {confidence:.2f}%")
 
 st.markdown("---")
 st.caption(
-    "Plant Disease Detection using Deep Learning and Computer Vision"
+    "Plant Disease Detection using Deep Learning & Computer Vision"
 )
