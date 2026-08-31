@@ -23,7 +23,6 @@ def preprocess_image(image_path):
     image = image.resize(IMAGE_SIZE)
 
     image_array = np.array(image, dtype=np.float32)
-    image_array = image_array / 255.0
     image_array = np.expand_dims(image_array, axis=0)
 
     return image_array
